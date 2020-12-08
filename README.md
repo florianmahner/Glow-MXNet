@@ -2,6 +2,7 @@
 
 This repository contains an implementation for Glow in Apache MXNet.
 
+```bash
 | Overview ────────────────────────────────────────────────────────────────────────────────|
 |
 ├── train_mnist.py :: main training file
@@ -10,6 +11,7 @@ This repository contains an implementation for Glow in Apache MXNet.
 ├── utils.py :: utilities for training
 ├── config.py :: configuration file for training procedure
 └── .
+```
 
 ## Usage
 
