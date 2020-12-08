@@ -18,63 +18,6 @@ from layers import (Split2D,
                     abs_log)
 
 
-class FlowNet(Layer):
-    ''' A FlowNet does the following operations: Squeeze <-> Flow <-> Split. L is the number of Flow blocks. 
-    K is the number of Squeeze, Flow, Split steps in one Block '''
-
-    def __init__(self, in_channels, K, L, affine=True, filter_size=512, temp=1.0):
-        super().__init__()
-        self.in_channels = in_channels
-        self.K = K
-        self.L = L
-        self.affine = affine
-        self.temp = temp
-        self.filter_size = filter_size
-        self._init_network()
-
-    def _init_network(self):
-        self.layers = nn.HybridSequential()
-        ch = self.in_channels
-
-        with self.name_scope():
-            for i in range(self.L):
-                ch *= 4
-                self.layers.add(Squeeze2D())
-
-                for _ in range(self.K):
-                    self.layers.add(Flow(ch, self.affine, self.filter_size))
-
-                # All Blocks split exept the last one
-                if i < (self.L - 1):
-                    ch = ch // 2
-                    self.layers.add(Split2D(ch))
-
-    def forward(self, x_in):
-        ''' Forward pass through the entire network '''
-        log_det = 0
-        z_i = x_in
-        z_list = []
-        for layer in self.layers:
-            z_i, det = layer(z_i)
-            log_det = log_det + det
-            z_list.append(z_i)
-
-        return z_list, log_det
-
-    def reverse(self, x_out):
-        ''' Backward (reverse) pass through the entire network '''
-        x_in = x_out
-        for layer in reversed(self.layers):
-            if isinstance(layer, Split2D):
-                # sample with temperature from gaussian
-                x_in = layer.reverse(x_in, self.temp)
-
-            else:
-                x_in = layer.reverse(x_in)
-                
-        return x_in
-
-
 class Glow(nn.HybridBlock):
     ''' The Glow architecture '''
 
@@ -172,3 +115,60 @@ class Glow(nn.HybridBlock):
             x = self.flow_net.reverse(z)
 
         return x
+        
+
+class FlowNet(Layer):
+    ''' A FlowNet does the following operations: Squeeze <-> Flow <-> Split. L is the number of Flow blocks. 
+    K is the number of Squeeze, Flow, Split steps in one Block '''
+
+    def __init__(self, in_channels, K, L, affine=True, filter_size=512, temp=1.0):
+        super().__init__()
+        self.in_channels = in_channels
+        self.K = K
+        self.L = L
+        self.affine = affine
+        self.temp = temp
+        self.filter_size = filter_size
+        self._init_network()
+
+    def _init_network(self):
+        self.layers = nn.HybridSequential()
+        ch = self.in_channels
+
+        with self.name_scope():
+            for i in range(self.L):
+                ch *= 4
+                self.layers.add(Squeeze2D())
+
+                for _ in range(self.K):
+                    self.layers.add(Flow(ch, self.affine, self.filter_size))
+
+                # All Blocks split exept the last one
+                if i < (self.L - 1):
+                    ch = ch // 2
+                    self.layers.add(Split2D(ch))
+
+    def forward(self, x_in):
+        ''' Forward pass through the entire network '''
+        log_det = 0
+        z_i = x_in
+        z_list = []
+        for layer in self.layers:
+            z_i, det = layer(z_i)
+            log_det = log_det + det
+            z_list.append(z_i)
+
+        return z_list, log_det
+
+    def reverse(self, x_out):
+        ''' Backward (reverse) pass through the entire network '''
+        x_in = x_out
+        for layer in reversed(self.layers):
+            if isinstance(layer, Split2D):
+                # sample with temperature from gaussian
+                x_in = layer.reverse(x_in, self.temp)
+
+            else:
+                x_in = layer.reverse(x_in)
+                
+        return x_in
