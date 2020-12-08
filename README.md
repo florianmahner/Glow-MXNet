@@ -3,7 +3,7 @@
 This repository contains an implementation for Glow in Apache MXNet.
 
 ```bash
-| Overview ────────────────────────────────────────────────────────────────────────────────|
+| Overview ────────────────────────────────────────────────────────────|
 |
 ├── train_mnist.py :: main training file
 ├── glow.py :: glow top level architecture 
