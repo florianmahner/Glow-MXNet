@@ -8,8 +8,8 @@ This repository contains an implementation for Glow in Apache MXNet.
 ├── train_mnist.py :: main training file
 ├── glow.py :: glow top level architecture 
 ├── layers.py :: building blocks of the flow network
-├── utils.py :: utilities for training
-├── config.py :: configuration file for training procedure
+├── utils.py :: utilities to train the network
+├── config.py :: configuration file that defines the training procedure
 └── .
 ```
 
