@@ -18,3 +18,15 @@ This repository contains an implementation for Glow in Apache MXNet.
 To run and train on MNIST samples, simply modify the parameters in `config.py` and execute:
 
 > python train_mnist.py
+
+## References
+
+```
+@inproceedings{kingma2018glow,
+  title={Glow: Generative flow with invertible 1x1 convolutions},
+  author={Kingma, Durk P and Dhariwal, Prafulla},
+  booktitle={Advances in Neural Information Processing Systems},
+  pages={10215--10224},
+  year={2018}
+}
+```
